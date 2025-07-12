@@ -31,15 +31,54 @@ export class AppController {
     @Ctx() context: RmqContext,
   ) {
     const channel = context.getChannelRef();
-    const originalMessage = context.getMessage();
+    const originalMsg = context.getMessage();
 
     try {
       console.log('Message received from client A:', body);
+
+      const retryCount = body.retries ?? 0;
+      if (retryCount > 2) {
+        console.warn('Message exceeded retry limit. Sending to DLQ:', body);
+
+        // 🔽 Send to DLQ manually
+        channel.sendToQueue(
+          'to-clientB.dlq',
+          Buffer.from(JSON.stringify(body)),
+          {
+            persistent: true,
+            contentType: 'application/json',
+          },
+        );
+
+        channel.ack(originalMsg); // Ack to remove from main queue
+        return;
+      }
+
+      // Simulate failure randomly
+      // if (Math.random() < 0.3) throw new Error('Simulated processing failure');
+
       this.socketGateway.sendMessageToClientBTab(body);
-      channel.ack(originalMessage);
+      channel.ack(originalMsg);
     } catch (err) {
       console.error('Error while processing message:', err);
-      channel.nack(originalMessage, false, false);
+
+      const retryCount = body.retries ?? 0;
+      const updatedMsg = {
+        ...body,
+        retries: retryCount + 1,
+      };
+
+      // 🔁 Send to retry queue with incremented retry count
+      channel.sendToQueue(
+        'to-clientB.retry',
+        Buffer.from(JSON.stringify(updatedMsg)),
+        {
+          persistent: true,
+          contentType: 'application/json',
+        },
+      );
+
+      channel.ack(originalMsg); // Ack to prevent requeueing the original message
     }
   }
 }
