@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Body, Controller, Inject, Post } from '@nestjs/common';
 import { CLIENT_B_SERVICE_RABBITMQ, MESSAGE_FORMAT } from './constants';
 import {
@@ -40,7 +37,6 @@ export class AppController {
       if (retryCount > 2) {
         console.warn('Message exceeded retry limit. Sending to DLQ:', body);
 
-        // 🔽 Send to DLQ manually
         channel.sendToQueue(
           'to-clientB.dlq',
           Buffer.from(JSON.stringify(body)),
@@ -50,7 +46,7 @@ export class AppController {
           },
         );
 
-        channel.ack(originalMsg); // Ack to remove from main queue
+        channel.ack(originalMsg);
         return;
       }
 
@@ -68,7 +64,6 @@ export class AppController {
         retries: retryCount + 1,
       };
 
-      // 🔁 Send to retry queue with incremented retry count
       channel.sendToQueue(
         'to-clientB.retry',
         Buffer.from(JSON.stringify(updatedMsg)),
@@ -78,7 +73,7 @@ export class AppController {
         },
       );
 
-      channel.ack(originalMsg); // Ack to prevent requeueing the original message
+      channel.ack(originalMsg);
     }
   }
 }
