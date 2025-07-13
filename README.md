@@ -2,7 +2,7 @@
 
 This backend service represents **Client B** in a real-time, bidirectional messaging system, leveraging **RabbitMQ** as a robust message broker and **WebSocket** for pushing messages to the frontend in real-time.
 
-> 🧠 This project is an integral part of a larger real-time client-to-client chat system. It facilitates communication with the [Client A Service](https://github.com/your-username/client-b-service) and interacts with a [React + Vite frontend app](https://github.com/your-username/realtime-chat-frontend) currently hosted on Vercel.
+> 🧠 This project is an integral part of a larger real-time client-to-client chat system. It facilitates communication with the [Client A Service](https://github.com/Ranjith-Prabhakar/Nest_Client_A) and interacts with a [React + Vite frontend app](https://github.com/Ranjith-Prabhakar/Frontend_For_Nest.git) currently hosted on Vercel.
 
 ---
 
@@ -45,15 +45,14 @@ To get the Client B Service up and running on your local machine, follow these s
 >   ```
 >
 >   (The RabbitMQ Management UI will be available at `http://localhost:15672` with default credentials `guest:guest`).
->   Alternatively, you can use a remote RabbitMQ instance (e.g., `amqp://guest:guest@52.66.253.102:5672`).
 
 ### 🔧 Install & Run
 
 1.  **Clone the repository:**
 
     ```bash
-    git clone https://github.com/your-username/client-a-service.git
-    cd client-a-service
+    git clone https://github.com/Ranjith-Prabhakar/Nest_Client_B.git
+    cd Nest_Client_B
     ```
 
 2.  **Install dependencies:**
@@ -68,7 +67,7 @@ To get the Client B Service up and running on your local machine, follow these s
     npm run start
     ```
 
-    The application will typically be accessible at: `http://localhost:3000`
+    The application will typically be accessible at: `http://localhost:3001`
 
 ### 🌐 REST Endpoint
 
@@ -85,7 +84,7 @@ This service exposes a REST endpoint for sending messages to Client B:
   }
   ```
 
-- **Functionality:** This endpoint receives messages from the Client A frontend and publishes them to the `to-clientA` queue in RabbitMQ. These messages are then consumed by the Client A backend and subsequently emitted to the Client A frontend in real-time.
+- **Functionality:** This endpoint receives messages from the Client B frontend and publishes them to the `to-clientA` queue in RabbitMQ. These messages are then consumed by the Client A backend and subsequently emitted to the Client A frontend in real-time.
 
 ### 📡 WebSocket Communication
 
